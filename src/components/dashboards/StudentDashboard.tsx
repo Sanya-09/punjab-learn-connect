@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Navigation } from '@/components/Navigation';
+import { format } from 'date-fns';
 import { 
   BookOpen, 
   Calendar, 
@@ -13,12 +15,33 @@ import {
   CheckCircle,
   Clock,
   TrendingUp,
-  Target
+  Target,
+  CalendarDays
 } from 'lucide-react';
 
 export const StudentDashboard = () => {
   const { t } = useLanguage();
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Mock attendance data for different dates
+  const attendanceData = {
+    '2024-01-15': { status: 'present', subjects: ['Math', 'Science', 'English'] },
+    '2024-01-16': { status: 'present', subjects: ['Math', 'Science', 'English', 'History'] },
+    '2024-01-17': { status: 'absent', subjects: [] },
+    '2024-01-18': { status: 'present', subjects: ['Math', 'English', 'History'] },
+    '2024-01-19': { status: 'present', subjects: ['Science', 'English', 'PE'] },
+    '2024-01-22': { status: 'present', subjects: ['Math', 'Science', 'English', 'History'] },
+    '2024-01-23': { status: 'present', subjects: ['Math', 'Science', 'English'] },
+    '2024-01-24': { status: 'present', subjects: ['Math', 'Science', 'History'] },
+    '2024-01-25': { status: 'absent', subjects: [] },
+    '2024-01-26': { status: 'present', subjects: ['Math', 'Science', 'English', 'PE'] },
+  };
+
+  const getAttendanceForDate = (date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return attendanceData[dateKey] || { status: 'no-data', subjects: [] };
+  };
 
   const menuItems = [
     { id: 'dashboard', label: t('dashboard'), icon: BarChart3 },
@@ -123,51 +146,112 @@ export const StudentDashboard = () => {
         );
 
       case 'attendance':
+        const currentAttendance = getAttendanceForDate(selectedDate);
+        const totalDays = Object.keys(attendanceData).length;
+        const presentDays = Object.values(attendanceData).filter(day => day.status === 'present').length;
+        const attendanceRate = Math.round((presentDays / totalDays) * 100);
+
         return (
-          <Card className="shadow-medium">
-            <CardHeader>
-              <CardTitle>{t('attendance')} Overview</CardTitle>
-              <CardDescription>Your attendance record for this month</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="text-center p-6 bg-success/10 rounded-lg">
-                    <CheckCircle className="h-12 w-12 text-success mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-success">92%</p>
-                    <p className="text-sm text-muted-foreground">Attendance Rate</p>
+          <div className="space-y-6">
+            <Card className="shadow-medium">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5" />
+                  {t('attendance')} Calendar
+                </CardTitle>
+                <CardDescription>Select a date to view attendance details</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Calendar */}
+                  <div className="space-y-4">
+                    <CalendarComponent
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => date && setSelectedDate(date)}
+                      className="rounded-md border pointer-events-auto"
+                      modifiers={{
+                        present: Object.keys(attendanceData).filter(key => 
+                          attendanceData[key].status === 'present'
+                        ).map(key => new Date(key)),
+                        absent: Object.keys(attendanceData).filter(key => 
+                          attendanceData[key].status === 'absent'
+                        ).map(key => new Date(key))
+                      }}
+                      modifiersStyles={{
+                        present: { backgroundColor: 'hsl(var(--success))', color: 'white' },
+                        absent: { backgroundColor: 'hsl(var(--destructive))', color: 'white' }
+                      }}
+                    />
                   </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Present Days</span>
-                      <span className="font-medium">23</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Absent Days</span>
-                      <span className="font-medium">2</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Total Days</span>
-                      <span className="font-medium">25</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <h4 className="font-medium">Recent Attendance</h4>
-                  {Array.from({ length: 7 }, (_, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                      <span className="text-sm">Day {i + 1}</span>
-                      <Badge variant={i === 2 ? "destructive" : "secondary"}>
-                        {i === 2 ? t('absent') : t('present')}
+
+                  {/* Selected Date Details */}
+                  <div className="space-y-4">
+                    <div className="text-center p-6 bg-gradient-card rounded-lg">
+                      <div className={`h-12 w-12 mx-auto mb-2 rounded-full flex items-center justify-center ${
+                        currentAttendance.status === 'present' ? 'bg-success/20' :
+                        currentAttendance.status === 'absent' ? 'bg-destructive/20' : 'bg-muted'
+                      }`}>
+                        {currentAttendance.status === 'present' ? (
+                          <CheckCircle className="h-6 w-6 text-success" />
+                        ) : currentAttendance.status === 'absent' ? (
+                          <Clock className="h-6 w-6 text-destructive" />
+                        ) : (
+                          <Calendar className="h-6 w-6 text-muted-foreground" />
+                        )}
+                      </div>
+                      <p className="text-lg font-bold">{format(selectedDate, 'MMMM d, yyyy')}</p>
+                      <Badge variant={
+                        currentAttendance.status === 'present' ? 'default' :
+                        currentAttendance.status === 'absent' ? 'destructive' : 'secondary'
+                      }>
+                        {currentAttendance.status === 'present' ? t('present') :
+                         currentAttendance.status === 'absent' ? t('absent') : 'No Data'}
                       </Badge>
                     </div>
-                  ))}
+
+                    {/* Subjects for the day */}
+                    {currentAttendance.subjects.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium">Subjects Attended</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          {currentAttendance.subjects.map((subject, index) => (
+                            <Badge key={index} variant="outline" className="justify-center">
+                              {subject}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Overall Statistics */}
+            <Card className="shadow-medium">
+              <CardHeader>
+                <CardTitle>Monthly Overview</CardTitle>
+                <CardDescription>Your attendance statistics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-success/10 rounded-lg">
+                    <p className="text-2xl font-bold text-success">{attendanceRate}%</p>
+                    <p className="text-sm text-muted-foreground">Attendance Rate</p>
+                  </div>
+                  <div className="text-center p-4 bg-primary/10 rounded-lg">
+                    <p className="text-2xl font-bold text-primary">{presentDays}</p>
+                    <p className="text-sm text-muted-foreground">Present Days</p>
+                  </div>
+                  <div className="text-center p-4 bg-destructive/10 rounded-lg">
+                    <p className="text-2xl font-bold text-destructive">{totalDays - presentDays}</p>
+                    <p className="text-sm text-muted-foreground">Absent Days</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         );
 
       case 'questions':
