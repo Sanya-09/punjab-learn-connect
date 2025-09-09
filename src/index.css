@@ -2,41 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Educational LMS Design System - Optimized for Rural Punjab Students */
 
 @layer base {
   :root {
+    /* Educational Primary - Trustworthy Blue */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 220 15% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 15% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 15% 20%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Trust & Learning Colors */
+    --primary: 210 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 210 85% 55%;
+    --primary-dark: 210 85% 35%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Success & Growth Colors */
+    --secondary: 150 80% 35%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 150 80% 45%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Soft Background Colors */
+    --muted: 210 40% 96%;
+    --muted-foreground: 220 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 100% 85%;
+    --accent-foreground: 220 15% 20%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Learning Progress Colors */
+    --success: 150 80% 35%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 100% 55%;
+    --warning-foreground: 220 15% 20%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Interface Elements */
+    --border: 210 20% 90%;
+    --input: 210 20% 95%;
+    --ring: 210 85% 45%;
 
-    --radius: 0.5rem;
+    /* Educational Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 85% 45%), hsl(210 85% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(150 80% 35%), hsl(150 80% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(210 85% 45%), hsl(180 70% 40%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 20% 98%));
+
+    /* Shadows & Effects */
+    --shadow-soft: 0 2px 10px hsl(210 85% 45% / 0.1);
+    --shadow-medium: 0 4px 20px hsl(210 85% 45% / 0.15);
+    --shadow-strong: 0 8px 30px hsl(210 85% 45% / 0.2);
+
+    /* Border Radius */
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
